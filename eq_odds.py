@@ -14,22 +14,16 @@ class EqOddsModel:
 
     def train(self, trainX, trainY, trainZ):
         # Get predictions probabilities for trainX
-        preds = self.clf.predict_proba(trainX)[:, 0]
+        preds = self.clf.predict_proba(trainX)[:, 1]
 
         mask_0 = [idx for idx, z_list in enumerate(trainZ) if z_list[0] == self.group_vals[0] ]
-        print(mask_0)
-
         mask_1 = [idx for idx, z_list in enumerate(trainZ) if z_list[0] == self.group_vals[1] ]
-        print(mask_1)
 
         group_0_preds = reduce(lambda lst, x: lst + [preds[x]], mask_0, [])
         group_1_preds = reduce(lambda lst, x: lst + [preds[x]], mask_1, [])
         group_0_label = reduce(lambda lst, x: lst + [trainY[x]], mask_0, [])
         group_1_label = reduce(lambda lst, x: lst + [trainY[x]], mask_1, [])
 
-        print(group_0_preds)
-        print(group_0_label)
-        # exit()
 
         # Obtain the mixin rates
 
@@ -45,7 +39,7 @@ class EqOddsModel:
     def predict_proba(self, testX, testZ):
 
 
-        preds = self.clf.predict_proba(testX)[:, 0]
+        preds = self.clf.predict_proba(testX)[:, 1]
 
         mask_0 = [idx for idx, z_list in enumerate(testZ) if z_list[0] == self.group_vals[0] ]
         mask_1 = [idx for idx, z_list in enumerate(testZ) if z_list[0] == self.group_vals[1] ]

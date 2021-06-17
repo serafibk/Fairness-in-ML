@@ -36,7 +36,7 @@ class EqOddsModel:
         self.mix_rates = mix_rates
         print(mix_rates)
 
-    def predict_proba(self, testX, testZ):
+    def predict_proba(self, testX, testY, testZ):
 
 
         preds = self.clf.predict_proba(testX)[:, 1]
@@ -46,11 +46,11 @@ class EqOddsModel:
 
         group_0_preds = reduce(lambda lst, x: lst + [preds[x]], mask_0, [])
         group_1_preds = reduce(lambda lst, x: lst + [preds[x]], mask_1, [])
-        # group_0_label = reduce(lambda lst, x: lst + [trainY[x]], mask_0, [])
-        # group_1_label = reduce(lambda lst, x: lst + [trainY[x]], mask_1, [])
+        group_0_label = reduce(lambda lst, x: lst + [testY[x]], mask_0, [])
+        group_1_label = reduce(lambda lst, x: lst + [testY[x]], mask_1, [])
 
-        group_0_test_model = Model(np.array(group_0_preds), None)
-        group_1_test_model = Model(np.array(group_1_preds), None)
+        group_0_test_model = Model(np.array(group_0_preds), np.array(group_0_label))
+        group_1_test_model = Model(np.array(group_1_preds), np.array(group_1_label))
 
         # Apply the mixing rates to the test models
         eq_odds_group_0_test_model, eq_odds_group_1_test_model = Model.eq_odds(group_0_test_model,
@@ -59,7 +59,7 @@ class EqOddsModel:
 
         z_group_0 = [self.group_vals[0] for x in range(len(group_0_preds))]
         z_group_1 = [self.group_vals[1] for x in range(len(group_1_preds))]
-        return np.append(eq_odds_group_0_test_model.pred, eq_odds_group_1_test_model.pred ), np.append(z_group_0, z_group_1)
+        return np.append(eq_odds_group_0_test_model.pred, eq_odds_group_1_test_model.pred ), np.append(eq_odds_group_0_test_model.label, eq_odds_group_1_test_model.label),np.append(z_group_0, z_group_1)
 
 
 

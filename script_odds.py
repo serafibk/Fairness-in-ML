@@ -55,8 +55,9 @@ else:
 fair_clf = EqOddsModel(clf=clf, group_col=21, group_vals=[0, 1])
 fair_clf.train(X_train, Y_train, Z_train)
 
-predicts, new_z_test = fair_clf.predict_proba(X_test, Z_test)
+predicts, labels, new_z_test = fair_clf.predict_proba(X_test, Y_test, Z_test)
 print(predicts)
+print(labels)
 print(new_z_test)
 
 

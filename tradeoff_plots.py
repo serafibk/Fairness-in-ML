@@ -239,11 +239,11 @@ def measure_equal_oppY1(Y, Z, A):
     a1_0 = 0
     for i, z in enumerate(Z):
         if Y[i] == 1:
-            if z[0] == 0:
+            if z == 0:
                 z0y1 += 1
                 if A[i] == 1:
                     a1_0 += 1
-            elif z[0] == 1:
+            elif z == 1:
                 z1y1 += 1
                 if A[i] == 1:
                     a1_1 += 1
@@ -310,8 +310,13 @@ def sample_scores(X, Y, Z, clf, num_samples, util_scores,fairness_scores, with_s
             Y_pred = clf.predict(samp_comb)
             Y_prob = np.max(clf.predict_proba(samp_comb),axis=1)
         else:
-            Y_pred = clf.predict(samp_x)
-            Y_prob = np.max(clf.predict_proba(samp_x),axis=1)
+            predicts, labels, new_z_test = clf.predict_proba(samp_x, samp_y, samp_z)
+            #Y_pred = clf.predict(samp_x)
+            #Y_prob = np.max(clf.predict_proba(samp_x),axis=1)
+            Y_prob = predicts
+            Y_pred = [round(p) for p in predicts]
+            samp_z = new_z_test
+            samp_y = labels
 
         util_results = []
         for score in util_scores:

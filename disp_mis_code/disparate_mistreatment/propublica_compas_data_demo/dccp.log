@@ -1,2 +1,36 @@
-iteration=1, cost value=0.61922, tau=0.00500, solver status=optimal
-iteration=2, cost value=0.61922, tau=0.00600, solver status=optimal
+iteration=1, cost value=0.61922, tau=0.00100, solver status=optimal
+iteration=2, cost value=0.61922, tau=0.00120, solver status=optimal
+iteration=1, cost value=0.62106, tau=5.00000, solver status=optimal
+max slack = 0.00035
+iteration=2, cost value=0.62141, tau=6.00000, solver status=optimal
+max slack = 0.00035
+iteration=3, cost value=0.62183, tau=7.20000, solver status=optimal
+max slack = 0.00034
+iteration=4, cost value=0.62231, tau=8.64000, solver status=optimal
+max slack = 0.00033
+iteration=5, cost value=0.62288, tau=10.36800, solver status=optimal
+max slack = 0.00032
+iteration=6, cost value=0.62354, tau=12.44160, solver status=optimal
+max slack = 0.00031
+iteration=7, cost value=0.62430, tau=14.92992, solver status=optimal
+max slack = 0.00030
+iteration=8, cost value=0.62517, tau=17.91590, solver status=optimal
+max slack = 0.00028
+iteration=9, cost value=0.62615, tau=21.49908, solver status=optimal
+max slack = 0.00026
+iteration=10, cost value=0.62724, tau=25.79890, solver status=optimal
+max slack = 0.00024
+iteration=11, cost value=0.62841, tau=30.95868, solver status=optimal
+max slack = 0.00021
+iteration=12, cost value=0.62962, tau=37.15042, solver status=optimal
+max slack = 0.00018
+iteration=13, cost value=0.63082, tau=44.58050, solver status=optimal
+max slack = 0.00014
+iteration=14, cost value=0.63187, tau=53.49660, solver status=optimal
+max slack = 0.00009
+iteration=15, cost value=0.63257, tau=64.19592, solver status=optimal
+max slack = 0.00004
+iteration=16, cost value=0.63272, tau=77.03511, solver status=optimal
+max slack = 0.00000
+iteration=17, cost value=0.63272, tau=92.44213, solver status=optimal
+max slack = 0.00000

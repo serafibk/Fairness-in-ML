@@ -99,7 +99,7 @@ def train_model_disp_mist(x, y, x_control, loss_function, EPS, cons_params=None)
 
     try:
 
-        tau, mu = 0.005, 1.2 # default dccp parameters, need to be varied per dataset
+        tau, mu = 0.001, 1.2 # default dccp parameters, need to be varied per dataset
         if cons_params is not None: # in case we passed these parameters as a part of dccp constraints
             if cons_params.get("tau") is not None: tau = cons_params["tau"]
             if cons_params.get("mu") is not None: mu = cons_params["mu"]
@@ -121,7 +121,7 @@ def train_model_disp_mist(x, y, x_control, loss_function, EPS, cons_params=None)
 
     # check that the fairness constraint is satisfied
     for f_c in constraints:
-        assert(f_c.value == True) # can comment this out if the solver fails too often, but make sure that the constraints are satisfied empirically. alternatively, consider increasing tau parameter
+        # assert(f_c.value == True) # can comment this out if the solver fails too often, but make sure that the constraints are satisfied empirically. alternatively, consider increasing tau parameter
         pass
 
 
@@ -210,8 +210,11 @@ def get_constraint_list_cov(x_train, y_train, x_control_train, sensitive_attrs_t
 
     constraints = []
     for attr in sensitive_attrs_to_cov_thresh.keys():
+        # print(attr)
+        # print(x_control_train)
 
         attr_arr = np.array(x_control_train[attr],dtype=int)
+        # print(attr_arr)
         attr_arr_transformed, index_dict = ut.get_one_hot_encoding(attr_arr)
 
         if index_dict is None: # binary attribute, in this case, the attr_arr_transformed is the same as the attr_arr
@@ -230,8 +233,13 @@ def get_constraint_list_cov(x_train, y_train, x_control_train, sensitive_attrs_t
                 s_val_to_avg[ct][0] = s_val_to_total[ct][1] / float(s_val_to_total[ct][0] + s_val_to_total[ct][1]) # N1/N in our formulation, differs from one constraint type to another
                 s_val_to_avg[ct][1] = 1.0 - s_val_to_avg[ct][0] # N0/N
 
+                # print(type(s_val_to_avg[ct][0]))
+                # print(s_val_to_avg[ct][1])
 
+            # print(attr_arr)
+            # print("gonna do forloop")
             for v in set(attr_arr):
+                # print("in start of loop")
 
                 idx = x_control_train[attr] == v
 
@@ -239,19 +247,25 @@ def get_constraint_list_cov(x_train, y_train, x_control_train, sensitive_attrs_t
                 # #DCCP constraints
                 dist_bound_prod = multiply(y_train[idx], x_train[idx] * w) # y.f(x)
 
-                # cons_sum_dict[0][v] = sum( cp.min(0, dist_bound_prod) ) * (s_val_to_avg[0][v] / len(x_train)) # avg misclassification distance from boundary
-                # cons_sum_dict[1][v] = sum( cp.min(0, multiply( (1 - y_train[idx])/2.0, dist_bound_prod) ) ) * (s_val_to_avg[1][v] / sum(y_train == -1)) # avg false positive distance from boundary (only operates on the ground truth neg dataset)
-                # cons_sum_dict[2][v] = sum( cp.min(0, multiply( (1 + y_train[idx])/2.0, dist_bound_prod) ) ) * (s_val_to_avg[2][v] / sum(y_train == +1)) # avg false negative distance from boundary
+                # print(np.shape(dist_bound_prod))
 
-                cons_sum_dict[0][v] = sum([ d for d in dist_bound_prod if d.value > 0])* (s_val_to_avg[0][v] / len(x_train)) # avg misclassification distance from boundary
-                cons_sum_dict[1][v] = sum([multiply( (1 - y_train[idx])/2.0, d) for d in dist_bound_prod if d.value > 0]) * (s_val_to_avg[1][v] / sum(y_train == -1)) # avg false positive distance from boundary (only operates on the ground truth neg dataset)
-                cons_sum_dict[2][v] = sum([multiply( (1 + y_train[idx])/2.0, d) for d in dist_bound_prod if d.value > 0]) * (s_val_to_avg[2][v] / sum(y_train == +1)) # avg false negative distance from boundary
+                cons_sum_dict[0][v] = sum( cp.min(dist_bound_prod, ) ) * (s_val_to_avg[0][v] / len(x_train)) # avg misclassification distance from boundary
+                cons_sum_dict[1][v] = sum( cp.min(multiply( (1 - y_train[idx])/2.0, dist_bound_prod),  ) ) * (s_val_to_avg[1][v] / sum(y_train == -1)) # avg false positive distance from boundary (only operates on the ground truth neg dataset)
+                cons_sum_dict[2][v] = sum( cp.min( multiply( (1 + y_train[idx])/2.0, dist_bound_prod),  ) ) * (s_val_to_avg[2][v] / sum(y_train == +1)) # avg false negative distance from boundary
+                # print(type((s_val_to_avg[0][v] / len(x_train))))
+                # print(type(sum([ d for d in dist_bound_prod if d.value > 0])))
+                # for d in dist_bound_prod:
+                #     print(d)
+                #     print(type(d))
+                # cons_sum_dict[0][v] = np.sum([ d for d in dist_bound_prod if d.value > 0]) * (s_val_to_avg[0][v] / len(x_train)) # avg misclassification distance from boundary
+                # cons_sum_dict[1][v] = np.sum([multiply( (1 - y_train[idx])/2.0, d) for d in dist_bound_prod if d.value > 0]) * (s_val_to_avg[1][v] / sum(y_train == -1)) # avg false positive distance from boundary (only operates on the ground truth neg dataset)
+                # cons_sum_dict[2][v] = np.sum([multiply( (1 + y_train[idx])/2.0, d) for d in dist_bound_prod if d.value > 0]) * (s_val_to_avg[2][v] / sum(y_train == +1)) # avg false negative distance from boundary
                 #################################################################
-                print(v)
-                print(np.shape(cons_sum_dict[0][v]))
-                print(np.shape(cons_sum_dict[1][v]))
-                print(np.shape(cons_sum_dict[2][v]))
-                print(np.shape(dist_bound_prod))
+                # print(v)
+                # print(np.shape(cons_sum_dict[0][v]))
+                # print(np.shape(cons_sum_dict[1][v]))
+                # print(np.shape(cons_sum_dict[2][v]))
+                # print(np.shape(dist_bound_prod))
 
             if cons_type == 4:
                 cts = [1,2]
@@ -264,8 +278,14 @@ def get_constraint_list_cov(x_train, y_train, x_control_train, sensitive_attrs_t
 
             #################################################################
             #DCCP constraints
+            # print("Affter loop")
+            # print(cts)
+            # print(sensitive_attrs_to_cov_thresh)
+            # print(cons_sum_dict)
             for ct in cts:
                 thresh = abs(sensitive_attrs_to_cov_thresh[attr][ct][1] - sensitive_attrs_to_cov_thresh[attr][ct][0])
+                # print(np.shape(cons_sum_dict[ct][0]))
+                # print(np.shape(cons_sum_dict[ct][1]))
                 constraints.append( cons_sum_dict[ct][1] <= cons_sum_dict[ct][0]  + thresh )
                 constraints.append( cons_sum_dict[ct][1] >= cons_sum_dict[ct][0]  - thresh )
 

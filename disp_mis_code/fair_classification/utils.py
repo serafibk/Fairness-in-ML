@@ -291,7 +291,7 @@ def get_one_hot_encoding(in_arr):
     """
 
     for k in in_arr:
-        if str(type(k)) != "<type 'numpy.float64'>" and type(k) != int and type(k) != np.int64:
+        if str(type(k)) != "<type 'numpy.float64'>" and type(k) != int and type(k) != np.int64 and type(k) != np.int32:
             print(str(type(k)))
             print("************* ERROR: Input arr does not have integer types")
             return None
@@ -317,6 +317,8 @@ def get_one_hot_encoding(in_arr):
         tup[ind] = 1 # set that value of tuple to 1
         out_arr.append(tup)
 
+    print(out_arr)
+    print(index_dict)
     return np.array(out_arr), index_dict
 
 def check_accuracy(model, x_train, y_train, x_test, y_test, y_train_predicted, y_test_predicted):
